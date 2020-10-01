@@ -5,6 +5,15 @@ use js_sys::Array;
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 use std::cmp;
 
+extern crate web_sys;
+
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -206,6 +215,8 @@ pub fn find_text_segments(
     thresholding(&mut image_data, width, height, gray_scale_threshold);
 
     let result = find_text(image_data, height, width, max_white_space, max_font_line_width, min_text_width);
+
+    log!("Found {} results", result.len());
 
     let final_result = Array::new_with_length(result.len() as u32);
     for (index, tmp_segment) in result.iter().enumerate() {
