@@ -50,7 +50,7 @@ fn get_index(x: &i32, y: &i32, width: i32, part: i32) -> usize {
     return (((y * width) + x) * 4 + part) as usize;
 }
 
-fn grayscale(image: &mut Vec<u8>, width: i32, height: i32) {
+pub fn grayscale(image: &mut Vec<u8>, width: i32, height: i32) {
     for y in 0..height {
         for x in 0..width {
             let r = image[get_index(&x, &y, width, 0)] as f32;
@@ -58,8 +58,8 @@ fn grayscale(image: &mut Vec<u8>, width: i32, height: i32) {
             let b = image[get_index(&x, &y, width, 2)] as f32;
 
             let r = (r * 0.3) as u8;
-            let g = (g * 0.3) as u8;
-            let b = (b * 0.3) as u8;
+            let g = (g * 0.59) as u8;
+            let b = (b * 0.11) as u8;
 
             image[get_index(&x, &y, width, 0)] = r;
             image[get_index(&x, &y, width, 1)] = g;
@@ -68,7 +68,7 @@ fn grayscale(image: &mut Vec<u8>, width: i32, height: i32) {
     }
 }
 
-fn thresholding(image: &mut Vec<u8>, width: i32, height: i32, threshold: u8) {
+pub fn thresholding(image: &mut Vec<u8>, width: i32, height: i32, threshold: u8) {
     grayscale(image, width, height);
 
     for y in 0..height {
