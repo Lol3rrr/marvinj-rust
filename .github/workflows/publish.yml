@@ -7,7 +7,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  chrome:
+  node:
     name: 
     runs-on: ubuntu-latest
 
