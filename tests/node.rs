@@ -6,7 +6,7 @@ use wasm_bindgen_test::*;
 use marvinj_rust::grayscale;
 
 #[wasm_bindgen_test]
-fn grayscaleTest() {
+fn grayscale_test() {
     let width = 1;
     let height = 1;
     let mut input: Vec<u8> = Vec::new();
