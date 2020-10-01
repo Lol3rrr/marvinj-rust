@@ -78,25 +78,19 @@ pub fn grayscale(image: &mut Vec<u8>, width: i32, height: i32) {
 }
 
 pub fn thresholding(image: &mut Vec<u8>, width: i32, height: i32, threshold: u8) {
-    grayscale(image, width, height);
-
     for y in 0..height {
         for x in 0..width {
             let gray = image[get_index(&x, &y, width, 0)] as u8;
-            let alpha = image[get_index(&x, &y, width, 3)] as u8;
 
-            let value = 255 * (gray < threshold) as u8;
+            let value = 255 * ((gray > threshold) as u8);
             image[get_index(&x, &y, width, 0)] = value;
             image[get_index(&x, &y, width, 1)] = value;
             image[get_index(&x, &y, width, 2)] = value;
-            image[get_index(&x, &y, width, 3)] = alpha;
         }
     }
 }
 
 fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_font_line_width: i32, min_text_width: i32) -> Vec<Segment> {
-    let mut result: Vec<Segment> = Vec::new();
-
     let mut segments: Vec<Vec<[i32;4]>> = Vec::new();
     let mut raw_segments: Vec<Vec<[i32;4]>> = Vec::new();
     for _ in 0..height {
@@ -109,9 +103,11 @@ fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_
     let mut white_pixels = 0;
     let mut black_pixels = 0;
 
+    // Initial loop
     for y in 0..height {
         for x in 0..width {
             let color = image[get_index(&x, &y, width, 0)] as u8;
+            log!("Color at {}-{}: {}", x, y, color);
 
             if color == 255 && pattern_start_x != -1 {
                 white_pixels += 1;
@@ -128,6 +124,7 @@ fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_
 
             if white_pixels > max_white_space || black_pixels > max_font_line_width || x == width - 1 {
                 if pattern_length >= min_text_width {
+                    log!("Added Segment {} - {}", pattern_start_x, y);
                     segments[y as usize].push([pattern_start_x, y, pattern_start_x + pattern_length, y]);
                 }
 
@@ -146,7 +143,7 @@ fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_
     for y in 0..height-2 {
         let list_y: &Vec<[i32; 4]> = &segments[y as usize];
 
-        for raw_w in 0..2 {
+        for raw_w in 1..3 {
             let w = y + raw_w;
 
             let list_w: &Vec<[i32; 4]> = &segments[w as usize];
@@ -183,6 +180,7 @@ fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_
         }
     }
 
+    let mut result: Vec<Segment> = Vec::new();
     for y in 0..height {
         let list: &Vec<[i32;4]> = &raw_segments[y as usize];
 
@@ -212,6 +210,7 @@ pub fn find_text_segments(
     min_text_width: i32,
     gray_scale_threshold: u8
 ) -> Array {
+    grayscale(&mut image_data, width, height);
     thresholding(&mut image_data, width, height, gray_scale_threshold);
 
     let result = find_text(image_data, height, width, max_white_space, max_font_line_width, min_text_width);
