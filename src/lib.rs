@@ -107,12 +107,12 @@ fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_
     for y in 0..height {
         for x in 0..width {
             let color = image[get_index(&x, &y, width, 0)] as u8;
-            log!("Color at {}-{}: {}", x, y, color);
-
             if color == 255 && pattern_start_x != -1 {
                 white_pixels += 1;
                 black_pixels = 0;
-            } else if color == 0 {
+            }
+            
+            if color == 0 {
                 black_pixels += 1;
                 
                 if pattern_start_x == -1 {
@@ -135,7 +135,7 @@ fn find_text(image: Vec<u8>, height: i32, width: i32, max_white_space: i32, max_
             }
 
             if pattern_start_x != -1 {
-                pattern_start_x += 1;
+                pattern_length += 1;
             }
         }
     }
